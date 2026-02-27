@@ -22,7 +22,10 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Enable pnpm via corepack (ships with Node.js 16.10+)
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # Verify installs
-RUN gcloud --version && node --version && npm --version
+RUN gcloud --version && node --version && npm --version && pnpm --version
 
 CMD ["bash"]
