@@ -7,7 +7,7 @@ Docker image combining [Google Cloud SDK](https://cloud.google.com/sdk) with [No
 | Tag      | Node.js    | Base                      |
 | -------- | ---------- | ------------------------- |
 | `node22` | 22 LTS     | `google/cloud-sdk:latest` |
-| `node24` | 24 Current | `google/cloud-sdk:latest` |
+| `node24` | 24 LTS     | `google/cloud-sdk:latest` |
 
 ## Usage
 
@@ -57,10 +57,11 @@ docker build --build-arg NODE_VERSION=24 -t gcloud-nodejs:node24 .
 
 The workflow requires the following configured in your GitHub repository:
 
-| Type     | Name                 | Description                                                                           |
-| -------- | -------------------- | ------------------------------------------------------------------------------------- |
-| Variable | `DOCKERHUB_USERNAME` | Your Docker Hub username                                                              |
-| Secret   | `DOCKERHUB_TOKEN`    | Docker Hub access token ([create one here](https://hub.docker.com/settings/security)) |
+| Type   | Name              | Description                                                                           |
+| ------ | ----------------- | ------------------------------------------------------------------------------------- |
+| Secret | `DOCKERHUB_TOKEN` | Docker Hub access token ([create one here](https://hub.docker.com/settings/security)) |
+
+The Docker Hub username (`williamrolando88`) is hardcoded in the workflow.
 
 Images are rebuilt:
 
@@ -73,3 +74,14 @@ Images are rebuilt:
 - All tools from `google/cloud-sdk:latest` (`gcloud`, `gsutil`, `bq`, `kubectl`, …)
 - Node.js (version controlled by tag)
 - `npm` (bundled with Node.js)
+- `pnpm` (latest, enabled via corepack)
+
+## Known issues
+
+These are documented but will not be fixed, since this image is going to be deprecated soon.
+
+- **Tags are mutable.** `node22` and `node24` are overwritten on every rebuild (at least weekly). There are no date- or SHA-based tags, so consumers can't pin a specific build.
+- **Builds are not reproducible.** The base image (`google/cloud-sdk:latest`) and pnpm (`pnpm@latest`) are unpinned, so two builds of the same commit can differ.
+- **No Node 26 tag.** Only Node 22 and 24 are built.
+- **The "Image digest" workflow step doesn't print the digest.** It only echoes the tags again.
+- **The `org.opencontainers.image.source` label is wrong.** It points to `github.com/williammorales/gcloud-nodejs`, but the repository is `github.com/williamrolando88/gcloud-nodejs`.
